@@ -1,6 +1,6 @@
-title: "Catatan Riset"
+title: "Alan's Blog"
 author: "Alan Adi Prastyo"
-description: "Some short description of your blog can go here." # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
+description: "  My first blog. Probably no one else will ever read it, but it's ok." # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
 
 # Email / Social media user names used by the minima theme:
 # All of these are optional and can be removed or commented out
@@ -31,7 +31,16 @@ plugins:
 
 titles_from_headings:
   strip_title: true
-  collections: true
+
+collections:
+  personal: # collection for personal blog posts
+    output: true
+
+#header_pages:
+#  - resume.html
+#  - archive.html
+#  - books.md
+#  - bookmarks.md
 
 defaults:
   - scope:
