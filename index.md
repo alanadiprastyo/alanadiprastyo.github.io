@@ -1,5 +1,3 @@
-Here you can say lots of fun things about your site.
+Just newbie person like learning something new , System Engineer, Developer
 
-Maybe say a some things about yourself.
-
-Or maybe what you plan to blog about.
+The business side of this blog is mostly about Cloud Computing, Kubernetes, Openshift, Automation tools like ansible or terraform and  programming tips and tools.
