@@ -203,9 +203,9 @@ Note: if you want to specific devices on a specific host `ceph orch daemon add o
 ceph mgr module enable dashboard
 ```
 Access to `https://10.0.21.16:8443/#/login`
-![Login Ceph](assets/login-dashboard-ceph.png)
+![Login Ceph](/img/ceph/login-dashboard-ceph.png)
 Access to Dashboard
-![Dashboard Ceph](assets/ceph-dashboard.png)
+![Dashboard Ceph](/img/ceph/ceph-dashboard.png)
 
 Ref:
 - https://docs.ceph.com
