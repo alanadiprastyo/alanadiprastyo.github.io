@@ -20,6 +20,7 @@ Notice that in this example, Keepalived and HAproxy are not installed on any of 
 
 
 ### **Prepare Hosts**
+---
 | IP Address 	| Hostname 	| Role 	|
 |---	|---	|---	|
 | 10.0.21.10 	| Bastion 	| jump server 	|
