@@ -1,3 +1,5 @@
-Just newbie person like learning something new , System Engineer, Developer
+"Jika seorang manusia mati maka terputuslah darinya amalnya kecuali dari tiga hal; dari sedekah jariyah atau ilmu yang diambil manfaatnya atau anak shalih yang mendoakannya.” (HR. Muslim no. 1631)
 
-The business side of this blog is mostly about Cloud Computing, Kubernetes, Openshift, Automation tools like ansible or terraform and  programming tips and tools.
+Semoga Allah beri hidayah untuk terus menempuh jalan meraih ilmu bermanfaat (dunia dan akhirat).
+
+Sumber https://rumaysho.com/3314-keutamaan-ilmu-agama.html

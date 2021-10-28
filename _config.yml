@@ -1,6 +1,6 @@
-title: "Alan's Blog"
+title: "Catatan Riset"
 author: "Alan Adi Prastyo"
-description: "  My first blog. Probably no one else will ever read it, but it's ok." # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
+description: "Catatan Riset ini merupakan kumpulan tulisan pribadi tentang riset yang penulis lakukan. Khususnya pada bidang Cloud Computing, Distributed Computing, DevSecOps, Kubernetes dan lain-lain" # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
 
 # Email / Social media user names used by the minima theme:
 # All of these are optional and can be removed or commented out
@@ -36,11 +36,13 @@ collections:
   personal: # collection for personal blog posts
     output: true
 
-#header_pages:
+header_pages:
 #  - resume.html
-#  - archive.html
+  - archive.html
 #  - books.md
-#  - bookmarks.md
+  - bookmarks.md
+
+home_post_limit: 5
 
 defaults:
   - scope:
