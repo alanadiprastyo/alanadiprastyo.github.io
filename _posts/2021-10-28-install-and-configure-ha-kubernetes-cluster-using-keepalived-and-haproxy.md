@@ -60,8 +60,9 @@ sudo yum install -y haproxy keepalived psmisc
 #### **Setting Haproxy**
 1. edit file `haproxy.cfg`
 ```bash
-vi vi /etc/haproxy/haproxy.cfg
+vi /etc/haproxy/haproxy.cfg
 ```
+
 ```bash
 global
   log /dev/log  local0
@@ -102,6 +103,7 @@ listen stats 10.0.21.5:8080
     stats realm HAProxy\ Statistics
     stats auth admin:haproxy123
 ```
+
 2. Enable and Start service Haproxy
 ```bash
 sudo systemctl enable --now haproxy
