@@ -372,7 +372,7 @@ yum install -y kubelet-1.22.0-0 kubeadm-1.22.0-0 kubectl-1.22.0-0 --disableexclu
 
 CRI-O uses “systemd” as the cgroup driver. Edit this file at `/usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf`
 
-```
+```bash
 # Note: This dropin only works with kubeadm and kubelet v1.11+
 [Service]
 Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"
