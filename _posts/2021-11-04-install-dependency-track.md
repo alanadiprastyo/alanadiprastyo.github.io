@@ -35,6 +35,11 @@ untuk install Dependency Track terdapat dua service yaitu API Server dan Front E
 # Downloads the latest Docker Compose file
 curl -LO https://dependencytrack.org/docker-compose.yml
 ```
+Note: Default database pada DT mengunakan H2 sehingga tidak disarankan mengunakan ini di production. untuk production DT mendukung beberapa database diantaranya adalah
+1. Microsoft SQL Server 2012 dan diatasnya
+2. MySQL 5.6 dan 5.7
+3. PostgreSQL 9.0 and higher
+
 kemudian edit bagian API_BASE_URL dan resource yang dibutuhkan pada docker-compose.yml
 
 ```yaml
