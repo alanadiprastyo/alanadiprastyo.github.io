@@ -70,10 +70,71 @@ install cephadm on node storage-ceph-01
 curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
 chmod +x cephadm
 ./cephadm add-repo --release octopus
-./cephadm install
-which cephadm
-# /usr/sbin/cephadm
 ```
+```bash
+$ ./cephadm install
+Installing packages ['cephadm']...
+Non-zero exit code 1 from yum install -y cephadm
+yum: stdout Loaded plugins: fastestmirror, langpacks, priorities
+yum: stdout Loading mirror speeds from cached hostfile
+yum: stdout  * base: pxe.dev.purestorage.com
+yum: stdout  * centosplus: pxe.dev.purestorage.com
+yum: stdout  * epel: mirror.lax.genesisadaptive.com
+yum: stdout  * extras: pxe.dev.purestorage.com
+yum: stdout  * updates: pxe.dev.purestorage.com
+yum: stdout 279 packages excluded due to repository priority protections
+yum: stdout Resolving Dependencies
+yum: stdout --> Running transaction check
+yum: stdout ---> Package cephadm.noarch 2:15.2.14-0.el7 will be installed
+yum: stdout --> Finished Dependency Resolution
+yum: stdout
+yum: stdout Dependencies Resolved
+yum: stdout
+yum: stdout ================================================================================
+yum: stdout  Package        Arch          Version                  Repository          Size
+yum: stdout ================================================================================
+yum: stdout Installing:
+yum: stdout  cephadm        noarch        2:15.2.14-0.el7          Ceph-noarch         55 k
+yum: stdout
+yum: stdout Transaction Summary
+yum: stdout ================================================================================
+yum: stdout Install  1 Package
+yum: stdout
+yum: stdout Total download size: 55 k
+yum: stdout Installed size: 223 k
+yum: stdout Downloading packages:
+yum: stdout Public key for cephadm-15.2.14-0.el7.noarch.rpm is not installed
+yum: stdout Retrieving key from https://download.ceph.com/keys/release.gpg
+yum: stderr warning: /var/cache/yum/x86_64/7/Ceph-noarch/packages/cephadm-15.2.14-0.el7.noarch.rpm: Header V4 RSA/SHA256 Signature, key ID    460f3994: NOKEY
+yum: stderr
+yum: stderr
+yum: stderr Invalid GPG Key from https://download.ceph.com/keys/release.gpg: No key found in given key data
+Traceback (most recent call last):
+  File "./cephadm", line 8432, in <module>
+    main()
+  File "./cephadm", line 8420, in main
+    r = ctx.func(ctx)
+  File "./cephadm", line 6384, in command_install
+    pkg.install(ctx.packages)
+  File "./cephadm", line 6231, in install
+    call_throws(self.ctx, [self.tool, 'install', '-y'] + ls)
+  File "./cephadm", line 1461, in call_throws
+    raise RuntimeError('Failed command: %s' % ' '.join(command))
+RuntimeError: Failed command: yum install -y cephadm
+```
+Based on (Ceph Documentation)[https://docs.ceph.com/en/mimic/install/get-packages/] , execute the following to install the release.asc key.
+```bash
+$ rpm --import 'https://download.ceph.com/keys/release.asc'
+```
+install cephadm package again and it succeeds.
+```bash
+$ ./cephadm install
+Installing packages ['cephadm']...
+   
+$ which cephadm
+/usr/sbin/cephadm
+```
+
 ### Install Ceph CLI
 ```bash
 cephadm prepare-host
