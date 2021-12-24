@@ -145,6 +145,24 @@ This command apply on storage-ceph-01
 ```bash
 cephadm bootstrap --mon-ip 10.0.21.16
 ```
+Note: it will be error if ssh port custom, so to solve this problem we can change the ssh configuration
+```bash
+Host *
+  StrictHostKeyChecking no
+  Port                  2222
+```
+```bash
+ceph cephadm set-ssh-config -i ssh_config
+ceph cephadm get-ssh-config
+---
+Host *
+  StrictHostKeyChecking no
+  Port                  2222
+---
+
+ceph orch host add storage-ceph-01
+ceph orch host ls
+```
 This command will:
 
 1. Create monitor and manager daemons on the local host for the new cluster
@@ -260,8 +278,29 @@ Note: if you want to specific devices on a specific host `ceph orch daemon add o
 ```
 
 ### Add module dashboard to easy manage the cluster
+1. Enable dashboard module
 ```bash
 ceph mgr module enable dashboard
+```
+2. generate and install a self signed certificate
+```bash
+ceph dashboard create-self-signed-cert
+```
+3. crete password
+```bash
+vi password.txt
+mypassword
+```
+4. Modify the access IP of the cluster dashboard
+```bash
+ceph config-key set mgr/dashboard/server_addr 0.0.0.0
+```
+View service access mode
+```bash
+ceph mgr services
+{
+    "dashboard": "https://storage-ceph-01:8443/"
+}
 ```
 Access to `https://10.0.21.16:8443/#/login`
 ![Login Ceph](/img/ceph/login-dashboard-ceph.png)
@@ -271,3 +310,4 @@ Access to Dashboard
 Ref:
 - https://docs.ceph.com
 - https://www.fatalerrors.org/a/cephadm-deploying-ceph-cluster.html
+- https://www.flamingbytes.com/posts/deploy-ceph-cluster/
