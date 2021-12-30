@@ -127,7 +127,8 @@ $ trivy image python:3.4-alpine
 ```
 <details>
 <summary>Result</summary>
-```bash
+
+```
 2021-12-30T10:41:02.376+0700	INFO	Detected OS: alpine
 2021-12-30T10:41:02.376+0700	INFO	Detecting Alpine vulnerabilities...
 2021-12-30T10:41:02.378+0700	INFO	Number of language-specific files: 1
