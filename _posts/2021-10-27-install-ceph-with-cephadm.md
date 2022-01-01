@@ -290,6 +290,8 @@ ceph dashboard create-self-signed-cert
 ```bash
 vi password.txt
 mypassword
+
+ceph dashboard ac-user-create admin -i password.txt administrator
 ```
 4. Modify the access IP of the cluster dashboard
 ```bash
