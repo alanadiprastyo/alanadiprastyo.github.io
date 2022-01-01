@@ -222,6 +222,7 @@ The cephadm boot process assigns the first monitor Daemon in the cluster to a sp
 Deploy monitors to specific host only
 ```bash
 ceph orch apply mon "storage-ceph-01,storage-ceph-02,storage-ceph-03"
+ceph orch apply mgr "storage-ceph-01,storage-ceph-02,storage-ceph-03"
 ```
 *Note: Make sure the first host (boot) is included in this list.*
 
