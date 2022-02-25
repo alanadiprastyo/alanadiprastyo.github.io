@@ -110,6 +110,8 @@ rook-ceph-external                                2m4s   Connected   Cluster con
 
 make sure status connected
 
+- Create Storage Class for Ceph RBD
+
 we will use pool replicated_2g, and create manifest for storageclass ceph external
 
 ```yaml
@@ -247,3 +249,182 @@ tmpfs                    7.8G     0  7.8G   0% /proc/acpi
 tmpfs                    7.8G     0  7.8G   0% /proc/scsi
 tmpfs                    7.8G     0  7.8G   0% /sys/firmware
 ```
+
+- Create Storage Class for Ceph Filesystem
+
+Before apply configuration storage class on kubernetes, we must create Filesystem on external Ceph Cluster
+
+1. Create Filesystem on ceph cluster
+```bash
+ceph fs volume create alan-mds --placement="3"
+```
+
+verify on ceph dashboard
+![Topologi](/img/ceph/fs.png)
+
+and also verify pool on ceph dashboard
+![Topologi](/img/ceph/pool-fs.png)
+
+Create manifest for storage class with name sc-ceph-fs.yaml
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-cephfs
+# Change "rook-ceph" provisioner prefix to match the operator namespace if needed
+provisioner: rook-ceph.cephfs.csi.ceph.com
+parameters:
+  # clusterID is the namespace where the rook cluster is running
+  # If you change this namespace, also change the namespace below where the secret namespaces are defined
+  clusterID: rook-ceph-external
+
+  # CephFS filesystem name into which the volume shall be created
+  fsName: alan-mds
+  # Ceph pool into which the volume shall be created
+  # Required for provisionVolume: "true"
+  pool: cephfs.alan-mds.data
+  #pool: awanio-cephfs 
+
+  # The secrets contain Ceph admin credentials. These are generated automatically by the operator
+  # in the same namespace as the cluster.
+  #csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph-external
+  #csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph-external
+  #csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph-external
+
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+```
+
+on manifest we must make sure some configuration like <b>clusterID</b>, <b>fsName</b> and <b>pool</b> 
+
+Apply the manifest
+```bash
+kubectl apply -f sc-ceph-fs.yaml
+```
+
+verify storage cluster
+```bash
+# kubectl get sc
+NAME                            PROVISIONER                     RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+longhorn                        driver.longhorn.io              Delete          Immediate           true                   51d
+rook-ceph-block-ext (default)   rook-ceph.rbd.csi.ceph.com      Delete          Immediate           true                   45d
+rook-cephfs                     rook-ceph.cephfs.csi.ceph.com   Delete          Immediate           true                   22h
+```
+
+Example create pvc use storage class rook-cephfs use kube-registry pod with the shared filesystem as the backing store
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cephfs-pvc
+  namespace: kube-system
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-cephfs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-registry
+  namespace: kube-system
+  labels:
+    k8s-app: kube-registry
+    kubernetes.io/cluster-service: "true"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      k8s-app: kube-registry
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-registry
+        kubernetes.io/cluster-service: "true"
+    spec:
+      containers:
+      - name: registry
+        image: registry:2
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        env:
+        # Configuration reference: https://docs.docker.com/registry/configuration/
+        - name: REGISTRY_HTTP_ADDR
+          value: :5000
+        - name: REGISTRY_HTTP_SECRET
+          value: "Ple4seCh4ngeThisN0tAVerySecretV4lue"
+        - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+          value: /var/lib/registry
+        volumeMounts:
+        - name: image-store
+          mountPath: /var/lib/registry
+        ports:
+        - containerPort: 5000
+          name: registry
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: registry
+        readinessProbe:
+          httpGet:
+            path: /
+            port: registry
+      volumes:
+      - name: image-store
+        persistentVolumeClaim:
+          claimName: cephfs-pvc
+          readOnly: false
+```
+```bash
+kubectl apply -f kube-registry-cephfs.yaml
+```
+verify deployment kube-registry
+```bash
+# kubectl get pvc -n kube-system
+NAME         STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+cephfs-pvc   Bound    pvc-b365e347-fdfc-4d91-8209-a9d9f003b658   1Gi        RWX            rook-cephfs    34s
+
+# kubectl exec -it kube-registry-5b677b6c87-qnwjt /bin/sh -n kube-system
+# df -h
+Filesystem                Size      Used Available Use% Mounted on
+overlay                 776.7G    311.2G    433.4G  42% /
+tmpfs                    64.0M         0     64.0M   0% /dev
+tmpfs                   125.8G         0    125.8G   0% /sys/fs/cgroup
+shm                      64.0M         0     64.0M   0% /dev/shm
+/dev/mapper/centos_awid9-root
+                        776.7G    311.2G    433.4G  42% /etc/hosts
+/dev/mapper/centos_awid9-root
+                        776.7G    311.2G    433.4G  42% /dev/termination-log
+/dev/mapper/centos_awid9-root
+                        776.7G    311.2G    433.4G  42% /etc/hostname
+/dev/mapper/centos_awid9-root
+                        776.7G    311.2G    433.4G  42% /etc/resolv.conf
+10.22.129.15:6789,10.22.129.16:6789,10.22.129.20:6789:/volumes/csi/csi-vol-88802b54-964b-11ec-96b5-3625ccda6e97/80d3f96b-809f-4623-b21b-4024a7c81c8a
+                          1.0G         0      1.0G   0% /var/lib/registry
+tmpfs                   100.0M     12.0K    100.0M   0% /run/secrets/kubernetes.io/serviceaccount
+tmpfs                   125.8G         0    125.8G   0% /proc/acpi
+tmpfs                    64.0M         0     64.0M   0% /proc/kcore
+tmpfs                    64.0M         0     64.0M   0% /proc/keys
+tmpfs                    64.0M         0     64.0M   0% /proc/timer_list
+tmpfs                    64.0M         0     64.0M   0% /proc/timer_stats
+tmpfs                    64.0M         0     64.0M   0% /proc/sched_debug
+tmpfs                   125.8G         0    125.8G   0% /proc/scsi
+tmpfs                   125.8G         0    125.8G   0% /sys/firmware
+```
+
+Ref:
+- https://rook.io/docs/rook/v1.8/ceph-filesystem.html
