@@ -54,3 +54,4 @@ sudo rm /etc/yum.repos.d/gitlab_gitlab-ce.repo
 
 Ref:
 - https://docs.gitlab.com/ee/update/package/convert_to_ee.html
+- https://docs.gitlab.com/ee/update/package/index.html#upgrade-using-the-official-repositories
