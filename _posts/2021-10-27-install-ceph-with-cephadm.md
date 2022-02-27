@@ -288,6 +288,7 @@ ceph mgr module enable dashboard
 ceph dashboard create-self-signed-cert
 ```
 3. crete password
+
 ```bash
 vi password.txt
 mypassword
